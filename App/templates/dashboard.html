@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="dashboard-wrapper">
+
+  <h1>Welcome to the UWI Stat Portal</h1>
+  <p>Explore a unified platform for uploading, validating, and reporting data across UWI campuses.</p>
+
+  <div class="card">
+    <h2>📊 Statistical Digests</h2>
+    <ul>
+      <li><a href="#">2013/14 to 2017/18</a></li>
+      <li><a href="#">2012/13 to 2016/17</a></li>
+      <li><a href="#">2011/12 to 2015/16</a></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>📎 Important Guide</h2>
+    <p>
+      Use the template below to upload your data.<br>
+      Click to download:
+    </p>
+    <div style="display: flex; gap: 1rem;">
+      <a href="{{ url_for('static', filename='guides/data_upload_guide.pdf') }}" download>
+        <img src="{{ url_for('static', filename='icons/pdf_icon.png') }}" alt="Download PDF" height="50">
+      </a>
+      <a href="{{ url_for('static', filename='guides/upload_template.xlsx') }}" download>
+        <img src="{{ url_for('static', filename='icons/excel_icon.png') }}" alt="Download Excel" height="50">
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

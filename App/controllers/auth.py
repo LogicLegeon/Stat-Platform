@@ -29,16 +29,17 @@ def setup_jwt(app):
 
 
 # Context processor to make 'is_authenticated' available to all templates
+from flask import session
+from App.models import User
+
 def add_auth_context(app):
   @app.context_processor
   def inject_user():
-      try:
-          verify_jwt_in_request()
-          user_id = get_jwt_identity()
-          current_user = User.query.get(user_id)
-          is_authenticated = True
-      except Exception as e:
-          print(e)
-          is_authenticated = False
-          current_user = None
-      return dict(is_authenticated=is_authenticated, current_user=current_user)
+      user_id = session.get('user_id')
+      current_user = User.query.get(user_id) if user_id else None
+      return dict(
+          is_authenticated=bool(user_id),
+          current_user=current_user,
+          username=session.get('username'),
+          role=session.get('role')
+      )

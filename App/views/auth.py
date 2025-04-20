@@ -1,72 +1,47 @@
-from flask import Blueprint, render_template, jsonify, request, flash, send_from_directory, flash, redirect, url_for
-from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies, set_access_cookies
-
-
-from.index import index_views
-
-from App.controllers import (
-    login
-)
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
+from App.models import User
+from App.database import db
 
 auth_views = Blueprint('auth_views', __name__, template_folder='../templates')
 
 
-
-
-'''
-Page/Action Routes
-'''    
-@auth_views.route('/users', methods=['GET'])
-def get_user_page():
-    users = get_all_users()
-    return render_template('users.html', users=users)
-
-@auth_views.route('/identify', methods=['GET'])
-@jwt_required()
-def identify_page():
-    return render_template('message.html', title="Identify", message=f"You are logged in as {current_user.id} - {current_user.username}")
-    
-
+# ---------- LOGIN ----------
 @auth_views.route('/login', methods=['POST'])
 def login_action():
-    data = request.form
-    token = login(data['username'], data['password'])
-    response = redirect(request.referrer)
-    if not token:
-        flash('Bad username or password given'), 401
-    else:
-        flash('Login Successful')
-        set_access_cookies(response, token) 
-    return response
+    username = request.form['username']
+    password = request.form['password']
 
+    user = User.query.filter_by(username=username).first()
+
+    if user and user.check_password(password):
+        session['user_id'] = user.id
+        session['username'] = user.username
+        flash('Login successful!')
+    else:
+        flash('Invalid username or password')
+    
+    return redirect(url_for('auth_views.dashboard'))
+
+
+# ---------- LOGOUT ----------
 @auth_views.route('/logout', methods=['GET'])
 def logout_action():
-    response = redirect(request.referrer) 
-    flash("Logged Out!")
-    unset_jwt_cookies(response)
-    return response
+    session.clear()
+    flash("👋 You have been logged out.")
+    return redirect(url_for('auth_views.dashboard'))
 
-'''
-API Routes
-'''
 
-@auth_views.route('/api/login', methods=['POST'])
-def user_login_api():
-  data = request.json
-  token = login(data['username'], data['password'])
-  if not token:
-    return jsonify(message='bad username or password given'), 401
-  response = jsonify(access_token=token) 
-  set_access_cookies(response, token)
-  return response
+# ---------- DASHBOARD ----------
+@auth_views.route('/dashboard')
+def dashboard():
+    if not session.get('user_id'):
+        flash('Please log in to access the dashboard.')
+        return redirect(url_for('auth_views.index'))
 
-@auth_views.route('/api/identify', methods=['GET'])
-@jwt_required()
-def identify_user():
-    return jsonify({'message': f"username: {current_user.username}, id : {current_user.id}"})
+    return render_template('dashboard.html')  # or pass datasets etc
 
-@auth_views.route('/api/logout', methods=['GET'])
-def logout_api():
-    response = jsonify(message="Logged Out!")
-    unset_jwt_cookies(response)
-    return response
+
+# ---------- INDEX (public landing page) ----------
+@auth_views.route('/')
+def index():
+    return render_template('index.html')

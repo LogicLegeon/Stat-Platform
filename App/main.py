@@ -32,9 +32,21 @@ def create_app(overrides={}):
     init_db(app)
     jwt = setup_jwt(app)
     setup_admin(app)
+
     @jwt.invalid_token_loader
     @jwt.unauthorized_loader
     def custom_unauthorized_response(error):
         return render_template('401.html', error=error), 401
+
+    # ✅ Add your context processor here
+    @app.context_processor
+    def inject_user():
+        from flask import session
+        return {
+            'is_authenticated': 'user_id' in session,
+            'username': session.get('username'),
+            'role': session.get('role')
+        }
+
     app.app_context().push()
     return app

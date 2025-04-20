@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h3>Upload Dataset</h3>
+<form method="POST" enctype="multipart/form-data" action="/upload">
+    <div class="input-field">
+        <input type="text" name="title" required>
+        <label for="title">Title</label>
+    </div>
+
+    <div class="input-field">
+        <textarea class="materialize-textarea" name="description"></textarea>
+        <label for="description">Description</label>
+    </div>
+
+    <div class="input-field">
+        <select name="data_type" required>
+            <option value="" disabled selected>Choose data type</option>
+            <option value="enrollment">Enrollment</option>
+            <option value="gpa">GPA Averages</option>
+            <option value="scholarships">Scholarships</option>
+        </select>
+        <label>Data Type</label>
+    </div>
+
+    <div class="file-field input-field">
+        <div class="btn purple">
+            <span>Choose File</span>
+            <input type="file" name="datafile" accept=".csv, .xlsx">
+        </div>
+        <div class="file-path-wrapper">
+            <input class="file-path validate" type="text">
+        </div>
+    </div>
+
+    <button type="submit" class="btn green">Upload</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        M.FormSelect.init(elems);
+    });
+</script>
+{% endblock %}

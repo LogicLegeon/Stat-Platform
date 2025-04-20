@@ -1,13 +1,41 @@
-{% extends "layout.html" %}
-{% block title %}Flask MVC App{% endblock %}
-{% block page %}Flask MVC App{% endblock %}
-
-{{ super() }}
-
+{% extends 'layout.html' %}
 {% block content %}
-    <h1>Flask MVC</h1>
-    {% if is_authenticated %}
-        <p> Welcome {{current_user.username}} </p>
-    {% endif %}
-    <p>This is a boileplate flask application which follows the MVC pattern for structuring the project.</p>
+
+{% if is_authenticated %}
+  <div class="dashboard-wrapper">
+    <h1>Welcome to the UWI Stat Portal</h1>
+    <p>Explore a unified platform for uploading, validating, and reporting data across UWI campuses.</p>
+
+    <div class="card">
+      <h2>Statistical Digests</h2>
+      <ul>
+        <li><a href="#">2013/14 to 2017/18</a></li>
+        <li><a href="#">2012/13 to 2016/17</a></li>
+        <li><a href="#">2011/12 to 2015/16</a></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>📎 Important Guide</h2>
+      <p>
+        Use the template below to upload your data.<br>
+        Click to download:
+      </p>
+      <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('static', filename='guides/data_upload_guide.pdf') }}" download>
+          <img src="{{ url_for('static', filename='icons/pdf_icon.png') }}" alt="Download PDF" height="50">
+        </a>
+        <a href="{{ url_for('static', filename='guides/upload_template.xlsx') }}" download>
+          <img src="{{ url_for('static', filename='icons/excel_icon.png') }}" alt="Download Excel" height="50">
+        </a>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="center-align">
+    <h4>Welcome to the UWI Stat Platform</h4>
+    <p>Please log in to continue.</p>
+  </div>
+{% endif %}
+
 {% endblock %}
