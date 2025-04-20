@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <h4>Submit Campus Data Entry</h4>
+  <form method="POST">
+    <input type="text" name="category" placeholder="e.g. Favorite Food" required>
+    <input type="text" name="label" placeholder="e.g. Pizza" required>
+    <input type="number" name="value" placeholder="Votes" required>
+    <button type="submit" class="btn green">Submit</button>
+  </form>
+
+  <h5 class="mt-4">🧾 Current Entries</h5>
+  <ul>
+    {% for item in data %}
+      <li><strong>{{ item.category }}</strong>: {{ item.label }} — {{ item.value }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

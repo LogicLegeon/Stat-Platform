@@ -25,7 +25,11 @@
           {% if is_authenticated %}
             <ul class="left hide-on-med-and-down" style="margin-left: 180px;">
               <li><a class="white-text" href="/dashboard">Dashboard</a></li>
-              <li><a class="white-text" href="/upload">Upload Sheet</a></li>
+              <li>
+                <a class="white-text" href="{{ url_for('entry_views.entry') }}">
+                  Upload Sheet
+                </a>
+              </li>              
               <li><a class="white-text" href="/reports">Reports</a></li>
             </ul>
             <ul class="right hide-on-med-and-down">
