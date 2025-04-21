@@ -10,3 +10,5 @@ views = [user_views, index_views, auth_views, entry_views]
 
 # Add a comment for setup_admin if it needs to be used elsewhere
 # setup_admin is imported but not added to views. Use it as needed.
+# App/views/__init__.py
+
