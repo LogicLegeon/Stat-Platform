@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container" style="margin-top:2rem;">
+  <h3>📈 Publish Report from User Entries</h3>
+
+  <form method="POST" class="section">
+    <div class="input-field">
+      <input id="title" name="title" type="text" required>
+      <label for="title">Report Title</label>
+    </div>
+
+    <div class="input-field">
+      <textarea id="description" name="description" class="materialize-textarea"></textarea>
+      <label for="description">Description (optional)</label>
+    </div>
+
+    <div class="input-field">
+      <select name="chart_type" required>
+        <option value="" disabled selected>Choose chart type</option>
+        <option value="bar">Bar</option>
+        <option value="line">Line</option>
+        <option value="pie">Pie</option>
+      </select>
+      <label>Chart Type</label>
+    </div>
+
+    <button type="submit" class="btn green">Publish Report</button>
+  </form>
+
+  <hr>
+
+  <h5>Existing User Entries (preview)</h5>
+  <ul class="collection">
+    {% for e in entries %}
+      <li class="collection-item">
+        <strong>{{ e.category }}</strong> — {{ e.label }} : {{ e.value }} 
+        <br><small>{{ e.campus }}, {{ e.year }} by {{ e.user.username }}</small>
+      </li>
+    {% else %}
+      <li class="collection-item grey-text">No entries submitted yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Customize Report for "{{ dataset.title }}"</h2>
+<form method="POST">
+  <input type="text" name="report_title" placeholder="Report Title" required>
+  <h4>Chart #1</h4>
+  <select name="chart_type_1">
+    <option value="bar">Bar</option>
+    <option value="line">Line</option>
+    <option value="pie">Pie</option>
+  </select>
+  <input type="text" name="chart_title_1" placeholder="Chart Title" required>
+  <textarea name="chart_config_1" placeholder='JSON config (e.g. {"labels": [...], "data": [...]})'></textarea>
+  <button type="submit" class="btn green">Create Report</button>
+</form>
+{% endblock %}
