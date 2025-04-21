@@ -157,3 +157,28 @@ def publish_entries():
         return redirect(url_for('admin.dashboard'))
 
     return render_template('admin/publish_entries.html', entries=entries)
+
+@admin.route('/review-entries')
+@jwt_required()
+def review_entries():
+    # show only pending entries
+    entries = Entry.query.filter_by(status='pending').all()
+    return render_template('admin/review_entries.html', entries=entries)
+
+@admin.route('/review-entries/<int:eid>/publish', methods=['POST'])
+@jwt_required()
+def publish_entry(eid):
+    e = Entry.query.get_or_404(eid)
+    e.status = 'published'
+    db.session.commit()
+    flash("✅ Entry published.", "success")
+    return redirect(url_for('admin.review_entries'))
+
+@admin.route('/review-entries/<int:eid>/delete', methods=['POST'])
+@jwt_required()
+def delete_entry(eid):
+    e = Entry.query.get_or_404(eid)
+    db.session.delete(e)
+    db.session.commit()
+    flash("🗑️ Entry deleted.", "info")
+    return redirect(url_for('admin.review_entries'))

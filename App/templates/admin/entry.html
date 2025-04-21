@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}Review Entries{% endblock %}
+
+{% block content %}
+<h4>All Entries</h4>
+<ul class="collection">
+    {% for entry in entries %}
+        <li class="collection-item">
+            <strong>Entry {{ entry.id }} by User {{ entry.user_id }}</strong>: {{ entry.label }}
+            <br>
+            <small>Submitted on {{ entry.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+        </li>
+    {% else %}
+        <li class="collection-item grey-text">No entries yet</li>
+    {% endfor %}
+</ul>
+{% endblock %}

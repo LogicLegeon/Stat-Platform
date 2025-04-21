@@ -14,23 +14,29 @@ def get_all_entries():
 from App.models import Entry
 from App.database import db
 
-def add_entry(category, label, value, year=None, campus=None):
-    print("💾 Writing entry to DB:", category, label, value, year, campus)
 
-    try:
-        entry = Entry(
-            category=category,
-            label=label,
-            value=value,
-            year=year,
-            campus=campus
-        )
-        db.session.add(entry)
-        print("🌀 Added to session")
-        db.session.commit()
-        print("✅ Entry committed successfully")
-    except Exception as e:
-        print("❌ ERROR committing entry to DB:", e)
+from App.models import Entry
+from App.database import db
+
+def add_entry(category, label, value, year=None, campus=None, user_id=None):
+    print("💾 Writing entry to DB:", category, label, value, year, campus, user_id)
+    entry = Entry(
+        category=category,
+        label=label,
+        value=value,
+        year=year,
+        campus=campus,
+        user_id=user_id
+    )
+    db.session.add(entry)
+    db.session.commit()
+
+def get_all_entries():
+    return Entry.query.all()
+
+def submit_entries_for_review():
+    # placeholder
+    return True
 
 
 def submit_entries_for_review():

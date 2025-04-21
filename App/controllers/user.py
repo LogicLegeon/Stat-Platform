@@ -7,6 +7,29 @@ def create_user(username, password):
     db.session.commit()
     return newuser
 
+from App.models import Entry
+from App.database import db
+
+def add_entry(category, label, value, year=None, campus=None, user_id=None):
+    print("💾 Writing entry to DB:", category, label, value, year, campus, user_id)
+    entry = Entry(
+        category=category,
+        label=label,
+        value=value,
+        year=year,
+        campus=campus,
+        user_id=user_id
+    )
+    db.session.add(entry)
+    db.session.commit()
+
+def get_all_entries():
+    return Entry.query.all()
+
+def submit_entries_for_review():
+    # placeholder
+    return True
+
 
 def get_user_by_username(username):
     return User.query.filter_by(username=username).first()

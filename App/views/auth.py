@@ -77,7 +77,7 @@ def login_action():
     if request.is_json:
         resp = jsonify({"message": "Login successful", "access_token": access_token})
     else:
-        resp = redirect(url_for('dashboard_views.dashboard'))
+        resp = redirect(url_for('dashboard_views.'))
         flash('Login successful', 'success')
 
     # 6) Set the JWT token in a cookie

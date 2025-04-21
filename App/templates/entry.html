@@ -10,7 +10,7 @@
 
       <!-- Year Selection -->
       <div class="input-field col s12 m6">
-        <label for="year" class="active">Year</label>
+        <label class="active" for="year">Year</label>
         <select name="year" id="year" class="browser-default" required>
           <option value="" disabled selected>Choose a year</option>
           <option value="2022">2022</option>
@@ -21,7 +21,7 @@
 
       <!-- Campus Selection -->
       <div class="input-field col s12 m6">
-        <label for="campus" class="active">Campus</label>
+        <label class="active" for="campus">Campus</label>
         <select name="campus" id="campus" class="browser-default" required>
           <option value="" disabled selected>Select campus</option>
           <option value="St Augustine">St Augustine</option>
@@ -32,9 +32,9 @@
 
       <!-- Question Type -->
       <div class="input-field col s12">
-        <label for="question_type" class="active">Data Entry Type</label>
+        <label class="active" for="question_type">Data Entry Type</label>
         <select name="question_type" id="question_type" class="browser-default" required onchange="showDynamicFields()">
-          <option value="">--Select--</option>
+          <option value="general">-- General Entry --</option>
           <option value="degree_percent">Percent of 20-year-olds in a degree program</option>
           <option value="avg_gpa_age">Average GPA by age group</option>
           <option value="housing_feedback">Student Housing Satisfaction</option>
@@ -43,7 +43,17 @@
     </div>
 
     <!-- Dynamic Fields -->
-    <div class="row" id="dynamic-fields"></div>
+    <div class="row" id="dynamic-fields">
+      <!-- Default general entry fields -->
+      <div class="input-field col s12 m6">
+        <input type="text" name="label" id="label" required>
+        <label class="active" for="label">Label (e.g. "Pizza")</label>
+      </div>
+      <div class="input-field col s12 m6">
+        <input type="number" name="value" id="value" required>
+        <label class="active" for="value">Value (e.g. "42")</label>
+      </div>
+    </div>
 
     <button type="submit" name="submit_data" class="btn green">✅ Add Entry</button>
   </form>
@@ -51,8 +61,8 @@
   <!-- Flash Messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      {% for category, msg in messages %}
-        <div class="card-panel {{ 'green lighten-4' if category=='success' else 'blue lighten-4' }}">
+      {% for category,msg in messages %}
+        <div class="card-panel {{ 'green lighten-4' if category=='success' else 'red lighten-4' }}">
           {{ msg }}
         </div>
       {% endfor %}
@@ -64,20 +74,13 @@
   <ul class="collection">
     {% for item in data %}
       <li class="collection-item">
-        <strong>{{ item.category }}</strong>: {{ item.label }} — {{ item.value }}<br>
-        <small><em>{{ item.campus }}</em>, {{ item.year }}</small>
+        {{ loop.index }}. <strong>{{ item.category }}</strong>: {{ item.label }} — {{ item.value }}<br>
+        <small>by {{ item.user.username }}, {{ item.campus }}, {{ item.year }}</small>
       </li>
     {% else %}
       <li class="collection-item grey-text">No entries yet</li>
     {% endfor %}
   </ul>
-
-  <hr>
-
-  <!-- Admin Review Button -->
-  <form method="POST" action="{{ url_for('entry_views.submit_for_review') }}">
-    <button type="submit" class="btn purple">📤 Upload for Admin Review</button>
-  </form>
 </div>
 
 <!-- Dynamic Form Builder -->
@@ -90,50 +93,61 @@ function showDynamicFields() {
   if (type === 'degree_percent') {
     container.innerHTML = `
       <div class="input-field col s12 m4">
-        <input type="number" name="age" required>
-        <label class="active">Age Group</label>
+        <input type="number" name="age" id="age" required>
+        <label class="active" for="age">Age Group</label>
       </div>
       <div class="input-field col s12 m4">
-        <label class="active">Degree Program</label>
-        <select name="degree" class="browser-default">
+        <select name="degree" id="degree" class="browser-default">
           <option value="Engineering">Engineering</option>
           <option value="Law">Law</option>
           <option value="Business">Business</option>
         </select>
+        <label class="active" for="degree">Degree Program</label>
       </div>
       <div class="input-field col s12 m4">
-        <input type="number" name="percent" required>
-        <label class="active">Percentage</label>
+        <input type="number" name="percent" id="percent" required>
+        <label class="active" for="percent">Percentage</label>
       </div>
     `;
-  }
-
-  if (type === 'avg_gpa_age') {
+  } else if (type === 'avg_gpa_age') {
     container.innerHTML = `
       <div class="input-field col s12 m6">
-        <input type="number" name="age" required>
-        <label class="active">Age Group</label>
+        <input type="number" name="age" id="age" required>
+        <label class="active" for="age">Age Group</label>
       </div>
       <div class="input-field col s12 m6">
-        <input type="number" step="0.01" name="gpa" required>
-        <label class="active">Average GPA</label>
+        <input type="number" step="0.01" name="gpa" id="gpa" required>
+        <label class="active" for="gpa">Average GPA</label>
       </div>
     `;
-  }
-
-  if (type === 'housing_feedback') {
+  } else if (type === 'housing_feedback') {
     container.innerHTML = `
       <div class="input-field col s12 m4">
-        <input type="number" name="housing_rating" min="1" max="5" required>
-        <label class="active">Rating (1–5)</label>
+        <input type="number" name="housing_rating" id="housing_rating" min="1" max="5" required>
+        <label class="active" for="housing_rating">Rating (1–5)</label>
       </div>
       <div class="input-field col s12 m8">
-        <textarea name="housing_comment" class="materialize-textarea" rows="3" placeholder="Optional comment..."></textarea>
-        <label class="active">Comment</label>
+        <textarea name="housing_comment" id="housing_comment" class="materialize-textarea" rows="3" placeholder="Optional comment..."></textarea>
+        <label class="active" for="housing_comment">Comment</label>
+      </div>
+    `;
+  } else {
+    // general entry fallback
+    container.innerHTML = `
+      <div class="input-field col s12 m6">
+        <input type="text" name="label" id="label" required>
+        <label class="active" for="label">Label (e.g. "Pizza")</label>
+      </div>
+      <div class="input-field col s12 m6">
+        <input type="number" name="value" id="value" required>
+        <label class="active" for="value">Value (e.g. "42")</label>
       </div>
     `;
   }
 }
+
+// Initialize with general entry fields
+document.addEventListener('DOMContentLoaded', showDynamicFields);
 </script>
 
 {% endblock %}

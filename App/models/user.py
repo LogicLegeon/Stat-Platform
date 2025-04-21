@@ -65,6 +65,31 @@ class Entry(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
     field_id = db.Column(db.Integer, db.ForeignKey('data_fields.id'))
+    user_id   = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # REVIEW: new status field
+    status    = db.Column(db.String(20), default='pending')
+
+    def __init__(self, category, label, value, year=None, campus=None, user_id=None):
+        self.category = category
+        self.label = label
+        self.value = value
+        self.year = year
+        self.campus = campus
+        self.user_id = user_id
+        self.status = 'pending'
+    def get_json(self):
+        return {
+            'id': self.id,
+            'category': self.category,
+            'label': self.label,
+            'value': self.value,
+            'year': self.year,
+            'campus': self.campus,
+            'user_id': self.user_id,
+            'dataset_id': self.dataset_id,
+            'field_id': self.field_id,
+            'status': self.status
+        }
 
     def __repr__(self):
         return f"<Entry {self.label} ({self.category}) — {self.value} @ {self.campus}, {self.year}>"

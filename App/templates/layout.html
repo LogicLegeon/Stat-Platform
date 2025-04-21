@@ -1,67 +1,62 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- Custom Styling FIRST to override Materialize -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
-    <!-- Google Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-    <!-- Materialize CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-
-    <!-- Mobile Responsiveness -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>{% block title %}UWI Stat Platform{% endblock %}</title>
+  <!-- Custom Styling FIRST to override Materialize -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Google Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Materialize CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <!-- Mobile Responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}UWI Stat Platform{% endblock %}</title>
 </head>
-
 <body>
+  <!-- NAVBAR -->
+  <nav class="purple darken-3">
+    <div class="nav-wrapper container">
+      <a href="{{ url_for('auth_views.index') }}" class="brand-logo white-text">UWI STAT</a>
 
-    <!-- NAVBAR -->
-    <nav class="purple darken-3">
-        <div class="nav-wrapper container">
-          <a href="/" class="brand-logo white-text">UWI STAT</a>
-      
-          {% if is_authenticated %}
-            <ul class="left hide-on-med-and-down" style="margin-left: 180px;">
-              <li><a class="white-text" href="/dashboard">Dashboard</a></li>
-              <li>
-                <a class="white-text" href="{{ url_for('entry_views.entry') }}">
-                  Upload Sheet
-                </a>
-              </li>              
-              <li><a class="white-text" href="/reports">Reports</a></li>
-            </ul>
-            <ul class="right hide-on-med-and-down">
-              <li><span class="white-text">👋 {{ username }}</span></li>
-              <li><a href="/logout" class="btn green">Logout</a></li>
-            </ul>
-          {% else %}
-            <div class="right" style="display: flex; align-items: center; gap: 10px;">
-              <form method="POST" action="/login" style="display: flex; align-items: center; gap: 10px; margin: 0;">
-                <div class="input-field" style="margin: 0;">
-                  <input id="username" name="username" type="text" required value="bob">
-                  <label for="username">Username</label>
-                </div>
-                <div class="input-field" style="margin: 0;">
-                  <input id="password" name="password" type="password" required value="bobpass">
-                  <label for="password">Password</label>
-                </div>
-                <button type="submit" class="btn green">Login</button>
-              </form>
-            </div>
+      {% if is_authenticated %}
+        <ul class="left hide-on-med-and-down" style="margin-left:180px;">
+          <li><a class="white-text" href="{{ url_for('dashboard_views.dashboard') }}">Dashboard</a></li>
+          <li><a class="white-text" href="{{ url_for('entry_views.entry') }}">Upload Sheet</a></li>
+          <li><a class="white-text" href="/reports">Reports</a></li>
+          {% if role == 'admin' %}
+            <li><a class="white-text" href="{{ url_for('admin.publish_entries') }}">Publish Entries</a></li>
+            <li><a class="white-text" href="{{ url_for('admin.upload') }}">Upload Dataset</a></li>
           {% endif %}
-        </div>
-      </nav>
-      
-  
+        </ul>
 
-    <!-- Main Content Area -->
-    <div class="container" style="margin-top: 30px;" id="content">
-        {% block content %}{% endblock %}
+        <ul class="right hide-on-med-and-down">
+          <li><span class="white-text">👋 {{ username }}</span></li>
+          <li><a href="/logout" class="btn green">Logout</a></li>
+        </ul>
+      {% else %}
+        <ul class="right" style="display:flex; align-items:center; gap:1rem;">
+          <form method="POST" action="{{ url_for('auth_views.login_action') }}" style="display:flex; align-items:center; gap:1rem; margin:0;">
+            <div class="input-field" style="margin:0;">
+              <input id="username" name="username" type="text" required>
+              <label for="username">Username</label>
+            </div>
+            <div class="input-field" style="margin:0;">
+              <input id="password" name="password" type="password" required>
+              <label for="password">Password</label>
+            </div>
+            <button type="submit" class="btn green">Login</button>
+          </form>
+        </ul>
+      {% endif %}
+
     </div>
+  </nav>
 
-    <!-- Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <!-- Main Content -->
+  <div class="container" style="margin-top:30px;" id="content">
+    {% block content %}{% endblock %}
+  </div>
 
-
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
