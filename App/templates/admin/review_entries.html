@@ -5,19 +5,18 @@
   {% if entries %}
     <ul class="collection">
       {% for e in entries %}
-      <li class="collection-item">
-        <strong>{{ e.category }}</strong>: {{ e.label }} — {{ e.value }}
-        <br>
-        <small>by {{ e.user.username }}, {{ e.campus }}, {{ e.year }}</small>
-        <div class="secondary-content">
-          <form method="POST" action="{{ url_for('admin.publish_entry', eid=e.id) }}" style="display:inline;">
-            <button class="btn-small green" type="submit">Publish</button>
-          </form>
-          <form method="POST" action="{{ url_for('admin.delete_entry', eid=e.id) }}" style="display:inline; margin-left:0.5rem;">
-            <button class="btn-small red" type="submit">Delete</button>
-          </form>
-        </div>
-      </li>
+        <li class="collection-item">
+          <strong>{{ e.category }}</strong>: {{ e.label }} — {{ e.value }}
+          <br><small>by {{ e.user.username }}, {{ e.campus }}, {{ e.year }}</small>
+          <div class="secondary-content">
+            <form method="POST" action="{{ url_for('admin.publish_entry', eid=e.id) }}" style="display:inline;">
+              <button class="btn-small green" type="submit">Publish</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.delete_entry', eid=e.id) }}" style="display:inline; margin-left:0.5rem;">
+              <button class="btn-small red" type="submit">Delete</button>
+            </form>
+          </div>
+        </li>
       {% endfor %}
     </ul>
   {% else %}

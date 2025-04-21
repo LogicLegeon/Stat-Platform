@@ -1,9 +1,4 @@
-# App/views/auth_views.py
-
-from flask import (
-    Blueprint, render_template, request,
-    flash, redirect, url_for, jsonify
-)
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_jwt_extended import (
     create_access_token,
     set_access_cookies,
@@ -19,7 +14,7 @@ auth_views = Blueprint('auth_views', __name__, template_folder='../templates')
 
 
 def admin_required(fn):
-    """Decorator: only allow users with is_admin=True"""
+    """Decorator: only allow users with is_admin=True."""
     @jwt_required()
     def wrapper(*args, **kwargs):
         verify_jwt_in_request()
@@ -27,7 +22,7 @@ def admin_required(fn):
         user = User.query.get(user_id)
         if not user or not getattr(user, 'is_admin', False):
             flash("Admins only!", "danger")
-            return redirect(url_for('auth_views.dashboard'))
+            return redirect(url_for('auth_views.index'))
         return fn(*args, **kwargs)
     wrapper.__name__ = fn.__name__
     return wrapper
@@ -44,7 +39,7 @@ def login_action():
     """
     Handles both form POSTs and JSON POSTs.
     - Form POST -> redirect to dashboard.
-    - JSON POST -> return JSON response.
+    - JSON POST -> return JSON response with token.
     """
     # 1) Grab credentials from either form or JSON
     if request.is_json:
@@ -62,7 +57,7 @@ def login_action():
         flash("Username and password are required", "danger")
         return redirect(url_for('auth_views.index'))
 
-    # 3) Validate credentials and generate token
+    # 3) Validate credentials
     user = auth_login(username, password)
     if not user:
         if request.is_json:
@@ -73,13 +68,22 @@ def login_action():
     # 4) Generate JWT token
     access_token = create_access_token(identity=str(user.id))
 
-    # 5) Build the response: JSON for API, redirect for form
+    # 5) Build the response
     if request.is_json:
         resp = jsonify({"message": "Login successful", "access_token": access_token})
     else:
-        resp = redirect(url_for('dashboard_views.'))
+        resp = redirect(url_for('dashboard_views.dashboard'))
         flash('Login successful', 'success')
 
     # 6) Set the JWT token in a cookie
     set_access_cookies(resp, access_token)
+    return resp
+
+
+@auth_views.route('/logout', methods=['GET'])
+def logout_action():
+    """Clear the session cookie and redirect to landing page."""
+    resp = redirect(url_for('auth_views.index'))
+    unset_jwt_cookies(resp)
+    flash("👋 You have been logged out.", "info")
     return resp

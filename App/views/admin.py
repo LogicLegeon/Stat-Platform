@@ -158,10 +158,13 @@ def publish_entries():
 
     return render_template('admin/publish_entries.html', entries=entries)
 
+from App.models.user import Entry
+from App.database import db
+
 @admin.route('/review-entries')
 @jwt_required()
 def review_entries():
-    # show only pending entries
+    """Show all entries waiting for approval."""
     entries = Entry.query.filter_by(status='pending').all()
     return render_template('admin/review_entries.html', entries=entries)
 
