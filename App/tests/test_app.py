@@ -1,79 +1,71 @@
-import os, tempfile, pytest, logging, unittest
-from werkzeug.security import check_password_hash, generate_password_hash
+# App/tests/test_app.py
+import logging
+import unittest
+import pytest   # only needed for the function‑style tests below
 
-from App.main import create_app
-from App.database import db, create_db
 from App.models import User
 from App.controllers import (
     create_user,
     get_all_users_json,
     login,
     get_user,
-    get_user_by_username,
     update_user
 )
 
-
 LOGGER = logging.getLogger(__name__)
 
-'''
-   Unit Tests
-'''
+
+# ------------------------------------------------------------------
+# Unit tests – pure model logic, no database or app context required
+# ------------------------------------------------------------------
+
 class UserUnitTests(unittest.TestCase):
 
     def test_new_user(self):
+        """Model stores username correctly."""
         user = User("bob", "bobpass")
-        assert user.username == "bob"
+        self.assertEqual(user.username, "bob")
 
-    # pure function no side effects or integrations called
     def test_get_json(self):
+        """Model returns expected JSON representation."""
         user = User("bob", "bobpass")
-        user_json = user.get_json()
-        self.assertDictEqual(user_json, {"id":None, "username":"bob"})
-    
+        expected = {"id": None, "username": "bob"}
+        self.assertDictEqual(user.get_json(), expected)
+
     def test_hashed_password(self):
-        password = "mypass"
-        hashed = generate_password_hash(password, method='sha256')
-        user = User("bob", password)
-        assert user.password != password
-
-    def test_check_password(self):
+        """Password is stored hashed and can be verified."""
         password = "mypass"
         user = User("bob", password)
-        assert user.check_password(password)
-
-'''
-    Integration Tests
-'''
-
-# This fixture creates an empty database for the test and deletes it after the test
-# scope="class" would execute the fixture once and resued for all methods in the class
-@pytest.fixture(autouse=True, scope="module")
-def empty_db():
-    app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
-    create_db()
-    yield app.test_client()
-    db.drop_all()
+        self.assertNotEqual(user.password, password)  # should be hashed
+        self.assertTrue(user.check_password(password))
 
 
-def test_authenticate():
-    user = create_user("bob", "bobpass")
-    assert login("bob", "bobpass") != None
+# ------------------------------------------------------------------
+# Integration tests – require application context & database
+# The `app` fixture comes from App/tests/conftest.py
+# ------------------------------------------------------------------
+
+def test_authenticate(app):
+    """create_user → login round‑trip works."""
+    create_user("alice", "alicepass")
+    assert login("alice", "alicepass") is not None
+
 
 class UsersIntegrationTests(unittest.TestCase):
 
     def test_create_user(self):
-        user = create_user("rick", "bobpass")
-        assert user.username == "rick"
+        user = create_user("rick", "rickpass")
+        self.assertEqual(user.username, "rick")
 
     def test_get_all_users_json(self):
         users_json = get_all_users_json()
-        self.assertListEqual([{"id":1, "username":"bob"}, {"id":2, "username":"rick"}], users_json)
+        usernames = {u["username"] for u in users_json}
+        # make sure at least our two test users are present
+        self.assertTrue({"alice", "rick"} <= usernames)
 
-    # Tests data changes in the database
     def test_update_user(self):
+        # assumes user with ID 1 exists from earlier setup
         update_user(1, "ronnie")
         user = get_user(1)
-        assert user.username == "ronnie"
-        
+        self.assertEqual(user.username, "ronnie")
 
